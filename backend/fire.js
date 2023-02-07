@@ -2,7 +2,6 @@ const firebase = require("firebase");
 require("firebase/firestore");
 require("dotenv").config();
 
-
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
   authDomain: process.env.FIREBASE_AUTH_DOMAIN,
@@ -16,6 +15,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const authDb = db.collection("auth");
 const AuthDocRef = authDb.doc("Cba3ElWxYEJ8mS3hQaDM");
+const prevRegDb = db.collection("PrevReg");
 
 const getAuth = () => {
   return AuthDocRef.get().then((doc) => {
@@ -36,7 +36,30 @@ const pushAuth = (data) => {
     .catch((error) => console.error("Error writing document: ", error));
 };
 
+const getPrevReg = (nickname) => {
+  return prevRegDb
+    .doc(nickname)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        return doc.data();
+      } else {
+        console.log("No such document!");
+      }
+    });
+};
+
+const sendPrevReg = (nickname, data) => {
+  prevRegDb
+    .doc(nickname)
+    .set(data)
+    .then(() => console.log("Document successfully written!"))
+    .catch((error) => console.error("Error writing document: ", error));
+};
+
 module.exports = {
-    getAuth,
-    pushAuth
-}
+  getAuth,
+  pushAuth,
+  getPrevReg,
+  sendPrevReg,
+};

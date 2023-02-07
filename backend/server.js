@@ -79,9 +79,38 @@ app.get("/getPublications", async (req, res) => {
 
   const today = new Date();
 
+  if (save === "true") {
+    fire.sendPrevReg(nickname, {
+      nickname: nickname,
+      date: today,
+      items: publicationResults,
+    });
+  }
+
   res.send({
     nickname: nickname,
     date: today,
     items: publicationResults,
   });
 });
+
+
+app.get('/getPrevReg', (req, res) => {
+  const { nickname } = req.query;
+  fire.getPrevReg(nickname)
+  .then(data => {
+    res.send(data)
+  })
+})
+
+/*
+
+Cuando clickeo en check data debe:
+
+- Levantar la data actual de la API de ML (me lo guarda en un estado) (Hecho)
+- Levantar la data anterior de la DB (me lo guarda en un estado) (Hecho)
+- Comparar ambas datas en el front y mostrar las diferencias 
+- Guardar la data actual en la DB (como data anterior)
+
+
+*/
