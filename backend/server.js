@@ -8,6 +8,8 @@ app.use(cors());
 
 const PORT = process.env.PORT || 3001;
 
+let ACCESS_TOKEN = "";
+
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
@@ -45,8 +47,41 @@ const renewToken = () => {
   });
 };
 
-renewToken().then((res) => (ACCESS_TOKEN = res));
-setInterval(() => {
-  renewToken().then((res) => (ACCESS_TOKEN = res));
-}, 14400000);
+renewToken().then((res) => {
+  console.log(res);
+  ACCESS_TOKEN = res;
+});
 
+app.get("/getPublications", async (req, res) => {
+  const { nickname, save } = req.query;
+  let offset = 0;
+  let publicationResults = [];
+  while (true) {
+    const response = await axios.get(
+      `https://api.mercadolibre.com/sites/MLA/search?nickname=${nickname}&offset=${offset}`,
+      {
+        headers: { Authorization: `Bearer ${ACCESS_TOKEN}` },
+      }
+    );
+    publicationResults = publicationResults.concat(response.data.results);
+    offset += 50;
+    if (response.data.results.length < 50) {
+      break;
+    }
+  }
+
+  publicationResults = publicationResults.map((item) => {
+    return {
+      id: item.id,
+      title: item.title,
+    };
+  });
+
+  const today = new Date();
+
+  res.send({
+    nickname: nickname,
+    date: today,
+    items: publicationResults,
+  });
+});
