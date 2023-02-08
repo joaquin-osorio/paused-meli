@@ -15,7 +15,7 @@ const Seller = ({ nickname }) => {
 
   const toast = useToast();
 
-  const baseUrl = "https://paused-meli-api.vercel.app/";
+  const baseUrl = "https://paused-meli-api.vercel.app";
 
   useEffect(() => {
     fetch(`${baseUrl}/getPrevReg?nickname=${nickname}`)
