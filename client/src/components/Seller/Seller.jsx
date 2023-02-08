@@ -15,7 +15,8 @@ const Seller = ({ nickname }) => {
 
   const toast = useToast();
 
-  const baseUrl = "https://paused-meli-api.vercel.app";
+  // const baseUrl = "https://paused-meli-api.vercel.app";
+  const baseUrl = "http://localhost:3001";
 
   useEffect(() => {
     fetch(`${baseUrl}/getPrevReg?nickname=${nickname}`)
@@ -61,6 +62,16 @@ const Seller = ({ nickname }) => {
           duration: 5000,
           position: "top",
         });
+      })
+      .catch((err) => {
+        toast({
+          title: "Error",
+          description: "Ha ocurrido un error",
+          status: "error",
+          duration: 5000,
+          position: "top",
+        });
+        console.log(err);
       });
   };
 
@@ -99,12 +110,19 @@ const Seller = ({ nickname }) => {
       ) : (
         <Text color="#25174E">No hay cambios</Text>
       )}
-      {
-        !dif.length ? <Button onClick={handleClick} colorScheme="teal">Check Data</Button> : <Button onClick={handleClick} colorScheme="teal" isDisabled>Check Data</Button>
-      }
-
+      {!dif.length ? (
+        <Button onClick={handleClick} colorScheme="teal">
+          Check Data
+        </Button>
+      ) : (
+        <Button onClick={handleClick} colorScheme="teal" isDisabled>
+          Check Data
+        </Button>
+      )}
     </Flex>
   );
 };
 
 export default Seller;
+
+//TODO: Puede devolver tambien el stock de cada item y pintar en amarillo los que tengan poco stock

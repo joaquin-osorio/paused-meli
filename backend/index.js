@@ -52,10 +52,57 @@ setInterval(() => {
   renewToken().then((res) => (ACCESS_TOKEN = res));
 }, 14400000);
 
+// app.get("/getPublications", async (req, res) => {
+//   const { nickname, save } = req.query;
+//   let offset = 0;
+//   let publicationResults = [];
+//   let total = 0;
+//   while (true) {
+//     const response = await axios.get(
+//       `https://api.mercadolibre.com/sites/MLA/search?nickname=${nickname}&offset=${offset}`,
+//       {
+//         headers: { Authorization: `Bearer ${ACCESS_TOKEN}` },
+//       }
+//     );
+//     publicationResults = publicationResults.concat(response.data.results);
+//     if (total === 0){
+//       total = response.data.paging.total;
+//     }
+//     offset += 50;
+//     if (response.data.results.length < 50) {
+//       break;
+//     }
+//   }
+
+//   publicationResults = publicationResults.map((item) => {
+//     return {
+//       id: item.id,
+//       title: item.title,
+//     };
+//   });
+
+//   const today = new Date();
+
+//   if (save === "true") {
+//     fire.sendPrevReg(nickname, {
+//       nickname: nickname,
+//       date: today,
+//       items: publicationResults,
+//     });
+//   }
+
+//   res.send({
+//     nickname: nickname,
+//     date: today,
+//     items: publicationResults,
+//   });
+// });
+
 app.get("/getPublications", async (req, res) => {
   const { nickname, save } = req.query;
   let offset = 0;
   let publicationResults = [];
+  let total = null;
   while (true) {
     const response = await axios.get(
       `https://api.mercadolibre.com/sites/MLA/search?nickname=${nickname}&offset=${offset}`,
@@ -65,8 +112,11 @@ app.get("/getPublications", async (req, res) => {
     );
     publicationResults = publicationResults.concat(response.data.results);
     offset += 50;
-    if (response.data.results.length < 50) {
+    total = total || response.data.paging.total;
+    if (publicationResults.length === total) {
       break;
+    } else if (response.data.results.length < 50) {
+      return res.status(500).send({ error: "La cantidad de resultados no coincide con el total esperado." });
     }
   }
 
