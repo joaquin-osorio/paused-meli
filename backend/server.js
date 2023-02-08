@@ -47,10 +47,10 @@ const renewToken = () => {
   });
 };
 
-renewToken().then((res) => {
-  console.log(res);
-  ACCESS_TOKEN = res;
-});
+renewToken().then((res) => (ACCESS_TOKEN = res));
+setInterval(() => {
+  renewToken().then((res) => (ACCESS_TOKEN = res));
+}, 14400000);
 
 app.get("/getPublications", async (req, res) => {
   const { nickname, save } = req.query;
